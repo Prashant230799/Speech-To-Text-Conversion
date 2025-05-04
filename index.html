@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Voice to Text Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎙️ Voice to Text Converter</h1>
+
+        <div class="section upload-section">
+            <h2>Upload Audio File</h2>
+            <input type="file" id="audioFile" accept="audio/*">
+            <br>
+            <button onclick="uploadAudio()">Convert Uploaded Audio</button>
+        </div>
+
+        <div class="section live-section">
+            <h2>Live Speech to Text</h2>
+            <button onclick="startListening()">🎤 Start Listening</button>
+            <button onclick="stopListening()">🛑 Stop Listening</button>
+        </div>
+
+        <div class="section download-section">
+            <button onclick="downloadText()">⬇️ Download Text</button>
+        </div>
+
+        <div class="result" id="resultText">
+            <p>Upload a file or use microphone to see text here!</p>
+        </div>
+    </div>
+
+    <script>
+        let finalText = '';
+
+        // Upload Audio to Flask
+        async function uploadAudio() {
+            const fileInput = document.getElementById('audioFile');
+            const resultDiv = document.getElementById('resultText');
+
+            if (fileInput.files.length === 0) {
+                alert('Please select an audio file first!');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            resultDiv.innerHTML = '⏳ Converting uploaded audio...';
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    finalText = data.text;
+                    resultDiv.innerHTML = `<b>Recognized Text (Upload):</b><br>${finalText}`;
+                } else {
+                    resultDiv.innerHTML = `<b>Error:</b> ${data.error}`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `<b>Unexpected Error:</b> ${error}`;
+            }
+        }
+
+        // Live Speech Recognition
+        let recognition;
+        function startListening() {
+            const resultDiv = document.getElementById('resultText');
+
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Sorry, your browser does not support Speech Recognition.');
+                return;
+            }
+
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = true;
+            recognition.continuous = true;
+
+            recognition.onstart = function() {
+                resultDiv.innerHTML = '🎤 Listening... Speak now!';
+                finalText = '';
+            };
+
+            recognition.onresult = function(event) {
+                let tempTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    tempTranscript += event.results[i][0].transcript;
+                }
+                finalText = tempTranscript;
+                resultDiv.innerHTML = `<b>Recognized Text (Live):</b><br>${finalText}`;
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Error occurred in recognition: ' + event.error);
+                resultDiv.innerHTML = `<b>Error:</b> ${event.error}`;
+            };
+
+            recognition.start();
+        }
+
+        function stopListening() {
+            if (recognition) {
+                recognition.stop();
+                document.getElementById('resultText').innerHTML += "<br>🛑 Stopped listening.";
+            }
+        }
+
+        // Download Text manually
+        function downloadText() {
+            if (finalText.trim() === '') {
+                alert('No text to download!');
+                return;
+            }
+
+            const blob = new Blob([finalText], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = 'recognized_text.txt';
+            link.click();
+        }
+    </script>
+
+</body>
+</html>

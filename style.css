@@ -1,0 +1,70 @@
+/* General Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to right, #74ebd5, #acb6e5);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    background: white;
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #555;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+input[type="file"] {
+    margin: 15px 0;
+    font-size: 16px;
+}
+
+button {
+    background-color: #6a11cb;
+    background-image: linear-gradient(315deg, #6a11cb 0%, #2575fc 74%);
+    color: white;
+    padding: 12px 24px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    margin: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+}
+
+.result {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: inset 0px 0px 10px rgba(0,0,0,0.05);
+    font-size: 18px;
+    color: #333;
+    min-height: 150px;
+}
